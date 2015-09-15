@@ -73,7 +73,7 @@
     <script type="text/javascript">
     (function() {
       //fix second modal closing.
-      $('.modal').on('hidden.bs.modal', function (e) {
+      $('#tracksModal').on('hidden.bs.modal', function (e) {
           $('body').addClass('modal-open');
       })
 
@@ -93,29 +93,41 @@
           });
 
          function handleResults (results) {
-          var artists = results.artists.items;
-          var image_string;
-          $(".results-list ul").empty();
-          artists.forEach(function (artist){
-
-            if (artist.images.length>0)
-              {image_string = '<div class="media-left media-middle"><img class="media-object scale" src ='+artist.images[0].url +'></div>'}
-            else{
-              image_string = ""
-            }
-          var artist_string = '<a class="show-album-list" data-toggle="modal" data-target="#albumModal" id="' +artist.id+'">'+artist.name+ '</a>'    
-          var html_string ='<li class="media list-group-item"> '+image_string+ '<div class="media-body"><h3 class="media-heading">' +artist_string+ '</h3> </div> </li>'
-         
-          $('.results-list ul').append(html_string)
-
-        })
+          buildList($('.results-list ul'), results.artists.items,"artists")
          }
-
-        
       }
   function handleError (err1, err2, err3) {
           console.error('OH NO!!', err1, err2, err3);
         }    
+
+  function buildList(where,list, type){
+    where.empty();
+    var stringFunction;
+        switch(type) {
+        case "artists":
+            stringFunction = artistString;
+            break; 
+        case "albums":
+            stringFunction = albumString;
+            break;
+        case "tracks":
+            stringFunction = trackString;
+            break;
+      }
+    list.forEach(function(item) {
+      where.append(stringFunction(item))
+    })
+  }
+
+  function artistString(artist){
+    var image_string ="";
+    if (artist.images.length>0) {
+      image_string = '<div class="media-left media-middle"><img class="media-object scale" src ='+artist.images[0].url +'></div>';
+    }
+           
+    var artist_string = '<a class="show-album-list" data-toggle="modal" data-target="#albumModal" id="' +artist.id+'">'+artist.name+ '</a>'    
+    return ('<li class="media list-group-item"> '+image_string+ '<div class="media-body"><h3 class="media-heading">' +artist_string+ '</h3> </div> </li>')
+  }
 
   $('.results-list ul').on('click', '.show-album-list', function(event) {
         searchAlbums($(event.target).parent());
@@ -134,15 +146,16 @@
           });
 
        function showAlbums(results){
-        var albums = results.items;
-        $("#albumModal .modal-body ul").empty();
-        albums.forEach(function (album){
-          var album_string = '<a class="show-track-list" data-toggle="modal" data-target="#tracksModal" id="' +album.id+'">'+album.name+ '</a>'
-          var html_string ='<li class="list-group-item">'+album_string+ '</li>'
-          $('#albumModal .modal-body ul').append(html_string)
-        })
+        buildList($('#albumModal .modal-body ul'), results.items,"albums")
        }
   }
+
+  function albumString(album) {
+    var album_string = '<a class="show-track-list" data-toggle="modal" data-target="#tracksModal" id="' +album.id+'">'+album.name+ '</a>'
+      return ('<li class="list-group-item">'+album_string+ '</li>')
+
+  }
+
 
  $('#albumModal .modal-body ul').on('click', '.show-track-list', function(event) {
         getTracks($(event.target).parent())
@@ -161,14 +174,13 @@
           });
 
        function showTracks(results){
-        var tracks = results.items;
-        $("#tracksModal .modal-body ul").empty();
-        tracks.forEach(function (track) {
-          var track_string = '<a target="_blank" href="'+track.preview_url+'">'+track.name+ '</a>'
-          var html_string ='<li class="list-group-item">'+track_string+ '</li>'
-          $('#tracksModal .modal-body ul').append(html_string)
-        })
+          buildList($("#tracksModal .modal-body ul"), results.items, "tracks")
     }
+  }
+
+  function trackString(track){
+    var track_string = '<a target="_blank" href="'+track.preview_url+'">'+track.name+ '</a>'
+        return '<li class="list-group-item">'+track_string+ '</li>'
   }
  })()
     </script>
