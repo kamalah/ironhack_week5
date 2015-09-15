@@ -2,7 +2,7 @@
   <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-
+     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
      <style>
      .scale {
     width: 100px;
@@ -25,10 +25,34 @@
   <ul class="media-list list-group">
   </ul>
   </div>
+
+ <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title"></h4>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
   </div>
  
 
     <script type="text/javascript">
+    (function() {
+  
       $('#submit').on('click',searchSpotify);
 
       function searchSpotify(event) {
@@ -47,7 +71,7 @@
 
          function handleResults (results) {
           var artists = results.artists.items;
-          var image_string ="";
+          var image_string;
           $(".results-list ul").empty();
           artists.forEach(function (artist){
 
@@ -56,29 +80,45 @@
             else{
               image_string = ""
             }
-
-          // var html_string ='<li>'+ artist.name + image_string+'</li>'
-
-          var html_string ='<li class="media list-group-item"> '+image_string+ '<div class="media-body"><h3 class="media-heading">' +artist.name + '</h3> </div> </li>'
+          var artist_string = '<a class="show-album-list" data-toggle="modal" data-target="#myModal">'+artist.name+ '</a>'    
+          var html_string ='<li class="media list-group-item"> '+image_string+ '<div class="media-body"><h3 class="media-heading">' +artist_string+ '</h3> </div> </li>'
+         
           $('.results-list ul').append(html_string)
 
         })
          }
 
-        function handleError (err1, err2, err3) {
+        
+      }
+  function handleError (err1, err2, err3) {
           console.error('OH NO!!', err1, err2, err3);
-        }
-      }
+        }    
 
-      function handleImages(image_array){
-        var thumbnail_string ="";
-        image_array.forEach(function (image) {
-            thumbnail_string +=  "<span><img src="+ image.url +"></span>"
+  $('.results-list ul').on('click', '.show-album-list', function(event) {
+        searchAlbums($(event.target).parent().text());
       })
-        return thumbnail_string
-
-      }
-
+      
+  function searchAlbums (artist_name) {
+        var search_string = artist_name.replace(' ','%20');
+        $('.modal-header').text(artist_name)
+        $.ajax({
+          url: 'https://api.spotify.com/v1/search?type=album&query='+search_string,
+          data: '',
+          success: showAlbums,
+          error: handleError,
+          dataType: 'json'
+          });
+       function showAlbums(results){
+        $('.modal-header').text(artist_name)
+        var albums = results.albums.items;
+         $(".modal-body ul").empty();
+        albums.forEach(function (album){
+          var html_string ='<li class="list-group-item">'+album.name+ '</li>'
+          $('.modal-body ul').append(html_string)
+        })
+       }
+       }
+})()
     </script>
   </body>
 </html>
