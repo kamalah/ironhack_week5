@@ -26,8 +26,29 @@
   </ul>
   </div>
 
- <!-- Modal -->
-  <div class="modal fade" id="myModal" role="dialog">
+ <!-- Album Modal -->
+  <div class="modal fade" id="albumModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title"></h4>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- Track Modal -->
+  <div class="modal fade" id="tracksModal" role="dialog">
     <div class="modal-dialog">
     
       <!-- Modal content-->
@@ -52,7 +73,7 @@
 
     <script type="text/javascript">
     (function() {
-  
+      var artists;
       $('#submit').on('click',searchSpotify);
 
       function searchSpotify(event) {
@@ -70,7 +91,7 @@
           });
 
          function handleResults (results) {
-          var artists = results.artists.items;
+          artists = results.artists.items;
           var image_string;
           $(".results-list ul").empty();
           artists.forEach(function (artist){
@@ -80,7 +101,7 @@
             else{
               image_string = ""
             }
-          var artist_string = '<a class="show-album-list" data-toggle="modal" data-target="#myModal">'+artist.name+ '</a>'    
+          var artist_string = '<a class="show-album-list" data-toggle="modal" data-target="#albumModal" id="' +artist.id+'">'+artist.name+ '</a>'    
           var html_string ='<li class="media list-group-item"> '+image_string+ '<div class="media-body"><h3 class="media-heading">' +artist_string+ '</h3> </div> </li>'
          
           $('.results-list ul').append(html_string)
@@ -95,30 +116,55 @@
         }    
 
   $('.results-list ul').on('click', '.show-album-list', function(event) {
-        searchAlbums($(event.target).parent().text());
+        searchAlbums($(event.target).parent().context.id);
       })
       
-  function searchAlbums (artist_name) {
-        var search_string = artist_name.replace(' ','%20');
-        $('.modal-header').text(artist_name)
+  function searchAlbums (artist_id) {
+
         $.ajax({
-          url: 'https://api.spotify.com/v1/search?type=album&query='+search_string,
+          url: 'https://api.spotify.com/v1/artists/'+artist_id+'/albums',
           data: '',
           success: showAlbums,
           error: handleError,
           dataType: 'json'
           });
+
        function showAlbums(results){
-        $('.modal-header').text(artist_name)
-        var albums = results.albums.items;
-         $(".modal-body ul").empty();
+        
+        var albums = results.items;
+        $("#albumModal .modal-body ul").empty();
         albums.forEach(function (album){
-          var html_string ='<li class="list-group-item">'+album.name+ '</li>'
-          $('.modal-body ul').append(html_string)
+          var album_string = '<a class="show-track-list" data-toggle="modal" data-target="#tracksModal" id="' +album.id+'">'+album.name+ '</a>'
+          var html_string ='<li class="list-group-item">'+album_string+ '</li>'
+          $('#albumModal .modal-body ul').append(html_string)
         })
        }
-       }
-})()
+  }
+
+ $('#albumModal .modal-body ul').on('click', '.show-track-list', function(event) {
+        getTracks($(event.target).parent().context.id)
+     })
+
+ function getTracks(album_id){
+    $.ajax({
+          url: 'https://api.spotify.com/v1/albums/'+album_id+'/tracks',
+          data: '',
+          success: showTracks,
+          error: handleError,
+          dataType: 'json'
+          });
+
+       function showTracks(results){
+        var tracks = results.items;
+        $("#tracksModal .modal-body ul").empty();
+        tracks.forEach(function (track) {
+          var track_string = '<a target="_blank" href="'+track.preview_url+'">'+track.name+ '</a>'
+          var html_string ='<li class="list-group-item">'+track_string+ '</li>'
+          $('#tracksModal .modal-body ul').append(html_string)
+        })
+    }
+  }
+ })()
     </script>
   </body>
 </html>
