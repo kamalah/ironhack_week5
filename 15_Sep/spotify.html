@@ -2,41 +2,63 @@
   <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> 
-     <style>
-     .scale {
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <style>
+    .scale {
     width: 100px;
-     }
-     </style>
+    }
+    </style>
   </head>
   <body>
-  <div class= "container">
-    <div class="container text-center">
-   
-      <h1> Spotify Search </h1>
-      <form>
-    <input type="text" name="query" placeholder="Search for...">
-    <button id="submit">Submit</button>
-
-    
-  </form>
-  </div>
-  <div class="results-list">
-  <ul class="media-list list-group">
-  </ul>
-  </div>
-
- <!-- Album Modal -->
-  <div class="modal fade" id="albumModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title"></h4>
+    <div class= "container">
+      <div class="container text-center">
+        
+        <h1> Spotify Search </h1>
+        <form>
+          <input type="text" name="query" placeholder="Search for...">
+          <button id="submit">Submit</button>
+          
+        </form>
+      </div>
+      <div class="row">
+        <div class="col-md-6 col-md-offset-1">
+          <div class="results-list">
+            <ul class="media-list list-group">
+            </ul>
+          </div>
         </div>
-        <div class="modal-body">
+      </div>
+      <!-- Album Modal -->
+      <div class="modal fade" id="albumModal" role="dialog">
+        <div class="modal-dialog">
+          
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+            <ul class="list-group"></ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    <!-- Track Modal -->
+    <div class="modal fade" id="tracksModal" role="dialog">
+      <div class="modal-dialog modal-sm">
+        
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title"></h4>
+          </div>
+          <div class="modal-body">
           <ul class="list-group"></ul>
         </div>
         <div class="modal-footer">
@@ -46,34 +68,15 @@
       
     </div>
   </div>
-
-  <!-- Track Modal -->
-  <div class="modal fade" id="tracksModal" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title"></h4>
-        </div>
-        <div class="modal-body">
-          <ul class="list-group"></ul>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-
-  </div>
- 
+</div>
 
     <script type="text/javascript">
     (function() {
-      var artists;
+      //fix second modal closing.
+      $('.modal').on('hidden.bs.modal', function (e) {
+          $('body').addClass('modal-open');
+      })
+
       $('#submit').on('click',searchSpotify);
 
       function searchSpotify(event) {
@@ -81,7 +84,6 @@
         var query = $("input[name=query]").val();
         console.debug('SUBMITTED');
         var search_string = query.replace(' ','%20');
-        console.log(search_string)
         $.ajax({
           url: 'https://api.spotify.com/v1/search?type=artist&query='+search_string,
           data: '',
@@ -91,13 +93,13 @@
           });
 
          function handleResults (results) {
-          artists = results.artists.items;
+          var artists = results.artists.items;
           var image_string;
           $(".results-list ul").empty();
           artists.forEach(function (artist){
 
             if (artist.images.length>0)
-              {image_string = '<div class="media-left"><img class="media-object scale" src ='+artist.images[0].url +'></div>'}
+              {image_string = '<div class="media-left media-middle"><img class="media-object scale" src ='+artist.images[0].url +'></div>'}
             else{
               image_string = ""
             }
@@ -116,11 +118,13 @@
         }    
 
   $('.results-list ul').on('click', '.show-album-list', function(event) {
-        searchAlbums($(event.target).parent().context.id);
+        searchAlbums($(event.target).parent());
       })
       
-  function searchAlbums (artist_id) {
-
+  function searchAlbums (artist_tag) {
+    var artist_name = artist_tag.text();
+    var artist_id = artist_tag.context.id;
+    $("#albumModal .modal-title").text('Albums by: '+artist_name);
         $.ajax({
           url: 'https://api.spotify.com/v1/artists/'+artist_id+'/albums',
           data: '',
@@ -130,7 +134,6 @@
           });
 
        function showAlbums(results){
-        
         var albums = results.items;
         $("#albumModal .modal-body ul").empty();
         albums.forEach(function (album){
@@ -142,10 +145,13 @@
   }
 
  $('#albumModal .modal-body ul').on('click', '.show-track-list', function(event) {
-        getTracks($(event.target).parent().context.id)
+        getTracks($(event.target).parent())
      })
 
- function getTracks(album_id){
+ function getTracks(album_tag){
+  var album_title = album_tag.text()
+  var album_id = album_tag.context.id
+   $("#tracksModal .modal-title").text('Tracks from the Album: '+album_title);
     $.ajax({
           url: 'https://api.spotify.com/v1/albums/'+album_id+'/tracks',
           data: '',
