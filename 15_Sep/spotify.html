@@ -1,0 +1,84 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+     <style>
+     .scale {
+    width: 100px;
+     }
+     </style>
+  </head>
+  <body>
+  <div class= "container">
+    <div class="container text-center">
+   
+      <h1> Spotify Search </h1>
+      <form>
+    <input type="text" name="query" placeholder="Search for...">
+    <button id="submit">Submit</button>
+
+    
+  </form>
+  </div>
+  <div class="results-list">
+  <ul class="media-list list-group">
+  </ul>
+  </div>
+  </div>
+ 
+
+    <script type="text/javascript">
+      $('#submit').on('click',searchSpotify);
+
+      function searchSpotify(event) {
+        event.preventDefault();
+        var query = $("input[name=query]").val();
+        console.debug('SUBMITTED');
+        var search_string = query.replace(' ','%20');
+        console.log(search_string)
+        $.ajax({
+          url: 'https://api.spotify.com/v1/search?type=artist&query='+search_string,
+          data: '',
+          success: handleResults,
+          error: handleError,
+          dataType: 'json'
+          });
+
+         function handleResults (results) {
+          var artists = results.artists.items;
+          var image_string ="";
+          $(".results-list ul").empty();
+          artists.forEach(function (artist){
+
+            if (artist.images.length>0)
+              {image_string = '<div class="media-left"><img class="media-object scale" src ='+artist.images[0].url +'></div>'}
+            else{
+              image_string = ""
+            }
+
+          // var html_string ='<li>'+ artist.name + image_string+'</li>'
+
+          var html_string ='<li class="media list-group-item"> '+image_string+ '<div class="media-body"><h3 class="media-heading">' +artist.name + '</h3> </div> </li>'
+          $('.results-list ul').append(html_string)
+
+        })
+         }
+
+        function handleError (err1, err2, err3) {
+          console.error('OH NO!!', err1, err2, err3);
+        }
+      }
+
+      function handleImages(image_array){
+        var thumbnail_string ="";
+        image_array.forEach(function (image) {
+            thumbnail_string +=  "<span><img src="+ image.url +"></span>"
+      })
+        return thumbnail_string
+
+      }
+
+    </script>
+  </body>
+</html>

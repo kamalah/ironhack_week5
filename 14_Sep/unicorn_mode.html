@@ -1,0 +1,27 @@
+<html>
+	<body >
+		<button class="unicorn">Unicorn</button>
+		<p class="texts">text</p>
+		<p class="texts">text</p>
+		<p class="texts">text</p>
+		<p class="texts">text</p>
+		<p class="texts">text</p>
+		<p class="texts">text</p>
+		<p class="texts">text</p>
+		<p class="texts">text</p>
+		<p class="texts">text</p>
+		<p class="texts">text</p>
+		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+			<script>
+			(function() {
+				$('button.unicorn').on('click', function(event) {
+					event.preventDefault()
+					var color = ['red','purple', 'yellow', 'green']
+					for (var i = 0; i < $('.texts').size(); i++) {
+						$('.texts:eq('+i+')').css("color",color[i%4])
+					};
+				});
+			})()
+		</script>
+	</body>
+</html>

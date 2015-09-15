@@ -1,0 +1,101 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1> Random Phrase Generator </h1>
+      <div class="row">
+        <div class="col-md-6 col-md-offset-1">
+          <div class="panel panel-info text-center">
+            <div class="panel-heading">
+                 <div class="random_phrase">
+              </div> 
+            </div>
+            <div class="panel-body">
+              
+              <button class="refresh">Refresh</button> <br> <br>
+              <form>
+                <input type="text" id="new_phrase" name="phrase" placeholder=" New Phrase" size="50">
+              </form>
+            </div></div></div></div>
+           <div class="row">
+        <div class="col-md-6 col-md-offset-1">
+          <a id="show-hide"> Hide </a>
+            <div class="phrases-div">
+              <ul>
+              </ul>
+            </div>
+            <div class="add-phrase" id="add-phrase">
+            </div>
+          </div>
+          </div>
+          </div>
+          <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+          <script>
+          
+          var phrases = ["Victor is the coolest 'American' I know.",
+          "Catalunya will vote on its independence from Spain.","Markus is so snarky", "Alvaro is very serious.","Baptiste has a case of the Mondays."];
+          window.onload = getPhrase();
+          
+          var get_number;
+          function getPhrase() {
+          get_number = Math.floor((Math.random() * phrases.length));
+          $('.random_phrase').html('<h2>'+phrases[get_number]+'</h2')
+          showPhrases();
+          };
+          
+          
+          (function () {
+          $('button.refresh').on('click', function(event) {
+          event.preventDefault();
+          getPhrase();
+          });
+          })();
+          
+          
+          (function () {
+          $('form').on('submit', function(event) {
+          event.preventDefault()
+          var phrase = $('input[name="phrase"]').val();
+          var delete_button = "<a class='delete_button'>X</a>";
+          phrases.push(phrase);
+          $(".phrases-div ul").append("<li>"+ phrase+" "+delete_button+"</li>");
+          $('input[name="phrase"]').val("");
+          });
+          })();
+          function showPhrases() {
+            var delete_button = "<a class='delete_button'>X</a>";
+            var list_items = ""
+            $(".phrases-div ul").empty();
+            for (var i = 0; i < phrases.length; i++) {
+              $(".phrases-div ul").append("<li><span>"+ phrases[i]+"</span>  "+delete_button+"</li>");
+              if (i == get_number) {
+                $(".phrases-div span").last().css("background-color", "yellow");
+              }
+            };
+          };
+
+          $(document).on('click',"#show-hide",function (){
+            $(".phrases-div").toggle();
+            if ($(".phrases-div").is(":hidden")) {
+              $('#show-hide').text("Show");
+            } else {
+              $('#show-hide').text("Hide");
+            }
+          });
+          
+          $(document).on('click',".delete_button", function (){
+            var id = $(".delete_button").index(this);
+            $(".delete_button:eq("+id+")").parent().remove();
+            phrases.splice(id,1);
+            });
+          
+          var inputBox = document.getElementById('new_phrase');
+          inputBox.onkeyup = function(){
+            var letter = inputBox.value;
+            document.getElementById('add-phrase').innerHTML = letter;
+          };
+          </script>
+        </body>
+      </html>
