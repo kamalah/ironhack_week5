@@ -1,0 +1,21 @@
+<html>
+	<body>
+		<input type="text">
+		<input type="text">
+		<input type="text">
+		<input type="text">
+		<input type="text">
+	</body>
+
+<script type="text/javascript">
+var elements = document.getElementsByTagName('input');
+var n = elements.length;
+
+for (var i=0; i<n; i++){
+	elements[i].onclick= function() {
+		console.log("This is the element #" + i);
+	};
+}
+</script>
+</html>
+

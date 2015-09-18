@@ -1,0 +1,73 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	</head>
+	<body>
+		<div class="container text-center">
+			<h1> Location </h1>
+			<h2 id="longitude"> </h2>
+			<h2 id="latitude"> </h2>
+			<button class="btn" id="i-was-here">I was here</button>
+			<button class="btn btn-primary" id="where-was-i">Where was I</button>
+			<button class="btn" id="clear-tracks">Clear my tracks</button>
+			<br><br>
+			<div class= "row">
+				<div class="col-md-7">
+					<div id="snap-shot"> </div>
+				</div>
+				<div class="col-md-4">
+					<div id="previous-locations"> </div>
+				</div>
+			</div>
+<script>
+
+
+var target = {lon:2.1766957, lat:41.391756799999996};
+var savedPositions = window.localStorage.getItem("savedPositions") ? JSON.parse(window.localStorage.getItem("savedPositions")) : [];
+
+$('#clear-tracks').on('click', function(event) {
+					event.preventDefault()
+					savedPositions=[];
+					$('#previous-locations table').remove();
+					window.localStorage.removeItem("savedPositions"); 					
+})
+$('#where-was-i').on('click', function(event) {
+					event.preventDefault()
+
+	var table_html = '<table class="table table-striped"><tr><th> # </th><th> Lat </th> <th> Lon </th><th> Time </th></tr>';
+
+	savedPositions.forEach(function (position, i) {
+		table_html +='<tr><td>'+i +'</td><td>'+ (Math.round(position.lat*1000)/1000) + '</td><td>' + (Math.round(position.lon*1000)/1000) +'</td><td>'+(new Date(position.time)) + '</td></tr>';
+	});
+	$('#previous-locations').html(table_html+'</table>')					
+});
+
+
+$('#i-was-here').on('click', function(event) {
+					event.preventDefault()
+navigator.geolocation.getCurrentPosition(onLocation, onError, {enableHighAccuracy: true})					
+});
+
+function onLocation(position) {	
+	var lon = position.coords.longitude;
+	var lat = position.coords.latitude;
+	console.log(position)
+	
+	$('#latitude').text("Latitude: "+lat);
+	$('#longitude').text("Longitude: "+lon);
+	$('#snap-shot').html('<img src="https://api.mapbox.com/v4/mapbox.streets/pin-l-rocket+482('+lon+','+lat+')/'+lon+','+lat+',14/600x600.png?access_token=pk.eyJ1IjoiaXJpZWthbWllIiwiYSI6ImNpZW1zODhhZTAwMmJ0bGtraG8xejkwamEifQ.oRW1h8ErZ_C-pVUIQDz22g">')
+
+	savedPositions.unshift({lon: lon, lat: lat, time: position.timestamp})
+	window.localStorage.setItem("savedPositions",JSON.stringify(savedPositions))
+}
+
+
+function onError(error) {
+	console.log(error)
+}
+
+</script>
+</body>
+</html>
+

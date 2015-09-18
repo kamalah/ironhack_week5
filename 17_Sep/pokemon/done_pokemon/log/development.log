@@ -1,0 +1,47 @@
+
+
+Started GET "/" for 127.0.0.1 at 2015-09-17 09:49:50 +0200
+Processing by StaticPagesController#home as HTML
+  Rendered static_pages/home.html.erb within layouts/application (0.9ms)
+Browserify: /home/kamalah/Documents/ironhack/Classwork/Week_5/17_Sep/pokemon/node_modules/.bin/browserifyinc --list --cachefile=\"/home/kamalah/Documents/ironhack/Classwork/Week_5/17_Sep/pokemon/tmp/cache/browserify-rails/browserifyinc-cache.json\" -o "/home/kamalah/Documents/ironhack/Classwork/Week_5/17_Sep/pokemon/tmp/cache/browserify-rails/output20150917-13689-v4f3qa" -
+Browserify: /home/kamalah/Documents/ironhack/Classwork/Week_5/17_Sep/pokemon/node_modules/.bin/browserifyinc  --cachefile=\"/home/kamalah/Documents/ironhack/Classwork/Week_5/17_Sep/pokemon/tmp/cache/browserify-rails/browserifyinc-cache.json\" -o "/home/kamalah/Documents/ironhack/Classwork/Week_5/17_Sep/pokemon/tmp/cache/browserify-rails/output20150917-13689-9xxq9w" -
+Completed 200 OK in 1692ms (Views: 1683.9ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/assets/pokemon_requests.self-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css?body=1" for 127.0.0.1 at 2015-09-17 09:49:52 +0200
+
+
+Started GET "/assets/static_pages.self-602aa3a5432e3457bff7ff358a341b8dace7291423930c81153ed0d7cdaa3cd3.css?body=1" for 127.0.0.1 at 2015-09-17 09:49:52 +0200
+
+
+Started GET "/assets/jquery_ujs.self-8e98a7a072a6cee1372d19fff9ff3e6aa1e39a37d89d6f06861637d061113ee7.js?body=1" for 127.0.0.1 at 2015-09-17 09:49:52 +0200
+
+
+Started GET "/assets/pokemon_solid-webfont.woff2" for 127.0.0.1 at 2015-09-17 09:49:52 +0200
+
+
+Started GET "/assets/jquery.self-d03a5518f45df77341bdbe6201ba3bfa547ebba8ed64f0ea56bfa5f96ea7c074.js?body=1" for 127.0.0.1 at 2015-09-17 09:49:52 +0200
+
+
+Started GET "/assets/application.self-5f8af13eb982c9c3ef40eaa6958860a257924e7d841cd96627f6f8e4f2466b0c.js?body=1" for 127.0.0.1 at 2015-09-17 09:49:52 +0200
+
+
+Started GET "/assets/turbolinks.self-c37727e9bd6b2735da5c311aa83fead54ed0be6cc8bd9a65309e9c5abe2cbfff.js?body=1" for 127.0.0.1 at 2015-09-17 09:49:52 +0200
+
+
+Started GET "/api/pokedex/1" for 127.0.0.1 at 2015-09-17 09:49:52 +0200
+Processing by PokemonRequestsController#forward as */*
+  Parameters: {"uri"=>"pokedex/1"}
+Completed 200 OK in 963ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/pokemon/19" for 127.0.0.1 at 2015-09-17 09:50:06 +0200
+Processing by PokemonRequestsController#forward as */*
+  Parameters: {"uri"=>"pokemon/19"}
+Completed 200 OK in 623ms (Views: 0.1ms | ActiveRecord: 0.0ms)
+
+
+Started GET "/api/sprite/20" for 127.0.0.1 at 2015-09-17 09:50:07 +0200
+Processing by PokemonRequestsController#forward as */*
+  Parameters: {"uri"=>"sprite/20"}
+Completed 200 OK in 500ms (Views: 0.1ms | ActiveRecord: 0.0ms)

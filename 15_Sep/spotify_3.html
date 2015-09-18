@@ -1,0 +1,176 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <style>
+    .scale {
+      width: 100px;
+    }
+    </style>
+  </head>
+  
+  <body>
+    <div class= "container">
+      <div class="container text-center">
+
+        <h1> Spotify Search </h1>
+        <form>
+          <input type="text" name="query" placeholder="Search for...">
+          <button id="submit">Submit</button>
+
+        </form>
+      </div>
+      <div class="row">
+        <div class="col-md-6 col-md-offset-1">
+          <div class="results-list">
+            <ul class="media-list list-group">
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Album Modal -->
+      <div class="modal fade" id="albumModal" role="dialog">
+        <div class="modal-dialog">
+
+          <!-- Modal content-->
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+            <ul class="list-group"></ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- Track Modal -->
+    <div class="modal fade" id="tracksModal" role="dialog">
+      <div class="modal-dialog modal-sm">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title"></h4>
+          </div>
+          <div class="modal-body">
+          <ul class="list-group"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+    <script type="text/javascript">
+    (function() {
+      //fix second modal closing.
+      $('#tracksModal').on('hidden.bs.modal', function() { 
+        $('body').addClass('modal-open');
+      })
+      
+      $('#submit').on('click', searchSpotify);
+
+      function handleError(err1, err2, err3) {
+        console.error('OH NO!!', err1, err2, err3);
+      }
+
+      function searchSpotify(event) {
+        event.preventDefault();
+        var query = $("input[name=query]").val();
+        console.debug('SUBMITTED');
+        var search_string = query.replace(' ', '%20');
+        $.ajax({
+          url: 'https://api.spotify.com/v1/search?type=artist&query=' + search_string,
+          data: '',
+          success: function (results) {
+            buildList($('.results-list ul'), results.artists.items, "artists")},
+          error: handleError,
+          dataType: 'json'
+        });
+      }
+
+  function buildList(where, list, type) {
+        where.empty();
+         var stringFunctions = {
+          "artists": artistString,
+          "albums": albumString,
+          "tracks": trackString}
+        list.forEach(function(item) {
+          where.append(stringFunctions[type](item));
+        })
+      }
+
+      function artistString(artist) {
+        var image_string = "";
+        if (artist.images.length > 0) {
+          image_string = '<div class="media-left media-middle"><img class="media-object scale" src =' + artist.images[0].url + '></div>';
+        }
+        
+        var artist_string = '<a class="show-album-list" data-toggle="modal" data-target="#albumModal" id="' + artist.id + '">' + artist.name + '</a>'
+        
+        return ('<li class="media list-group-item"> ' + image_string + '<div class="media-body"><h3 class="media-heading">' + artist_string + '</h3> </div> </li>')
+      }
+      
+      $('.results-list ul').on('click', '.show-album-list', function(event) {
+        searchAlbums($(event.target).parent());
+      })
+
+      function searchAlbums(artist_tag) {
+        var artist_name = artist_tag.text();
+        var artist_id = artist_tag.context.id;
+        
+        $("#albumModal .modal-title").text('Albums by: ' + artist_name);
+        $.ajax({
+          url: 'https://api.spotify.com/v1/artists/' + artist_id + '/albums',
+          data: '',
+          success: function (results) {
+            buildList($('#albumModal .modal-body ul'), results.items, "albums")},
+          error: handleError,
+          dataType: 'json'
+        });
+
+      }
+
+      function albumString(album) {
+        var album_string = '<a class="show-track-list" data-toggle="modal" data-target="#tracksModal" id="' + album.id + '">' + album.name + '</a>'
+        return ('<li class="list-group-item">' + album_string + '</li>')
+      }
+
+      $('#albumModal .modal-body ul').on('click', '.show-track-list', function(event) {
+        getTracks($(event.target).parent())
+      })
+
+      function getTracks(album_tag) {
+        var album_title = album_tag.text()
+        var album_id = album_tag.context.id
+        $("#tracksModal .modal-title").text('Tracks from the Album: ' + album_title);
+        
+        $.ajax({
+          url: 'https://api.spotify.com/v1/albums/' + album_id + '/tracks',
+          data: '',
+          success: function(results){
+            buildList($("#tracksModal .modal-body ul"), results.items, "tracks")},
+          error: handleError,
+          dataType: 'json'
+        });
+      }
+
+      function trackString(track) {
+        var track_string = '<a target="_blank" href="' + track.preview_url + '">' + track.name + '</a>'
+        return '<li class="list-group-item">' + track_string + '</li>'
+      }
+
+    })()
+    </script>
+  </body>
+</html>
